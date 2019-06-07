@@ -111,8 +111,8 @@ podTemplate(
 
             // Deploy the dev application
             openshift.set("env", "dc/tasks", "--overwrite VERSION='${devTag} (tasks-dev)'")
-            openshift.apply(dc);
             openshift.selector("dc", "tasks").rollout().latest();
+
             // Wait for application to be deployed
             def dc = openshift.selector("dc", "tasks").object()
             def dc_version = dc.status.latestVersion
