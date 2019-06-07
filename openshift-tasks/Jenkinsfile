@@ -37,8 +37,7 @@ podTemplate(
       def version = getVersionFromPom("pom.xml")
 
       // Set the tag for the development image: version + build number
-      //def devTag  = "${version}-" + currentBuild.number
-      def devTag = "${version}-${currentBuild.number}"
+      def devTag  = "${version}-" + currentBuild.number
       // Set the tag for the production image: version
       def prodTag = "${version}"
 
@@ -112,8 +111,8 @@ podTemplate(
 
             // Deploy the dev application
             openshift.set("env", "dc/tasks", "--overwrite VERSION='${devTag} (tasks-dev)'")
+            openshift.apply(dc);
             openshift.selector("dc", "tasks").rollout().latest();
-
             // Wait for application to be deployed
             def dc = openshift.selector("dc", "tasks").object()
             def dc_version = dc.status.latestVersion
