@@ -113,7 +113,7 @@ podTemplate(
             openshift.set("env", "dc/tasks", "--overwrite VERSION='${devTag} (tasks-dev)'")
             openshift.selector("dc", "tasks").rollout().latest();
 
-            echo "VERSION:                 '${prodTag} (${destApp})'"
+            echo "VERSION:                 '${devTag} (tasks-dev)'"
 
             // Wait for application to be deployed
             def dc = openshift.selector("dc", "tasks").object()
