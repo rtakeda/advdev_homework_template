@@ -113,6 +113,8 @@ podTemplate(
             openshift.set("env", "dc/tasks", "--overwrite VERSION='${devTag} (tasks-dev)'")
             openshift.selector("dc", "tasks").rollout().latest();
 
+            echo "VERSION:                 '${prodTag} (${destApp})'"
+
             // Wait for application to be deployed
             def dc = openshift.selector("dc", "tasks").object()
             def dc_version = dc.status.latestVersion
@@ -163,6 +165,8 @@ podTemplate(
 
             echo "Active Application:      " + activeApp
             echo "Destination Application: " + destApp
+            echo "VERSION:                 '${prodTag} (${destApp})'"
+
             // Update the image on the Prod deployment config
             def dc = openshift.selector("dc", "${destApp}").object()
             dc.spec.template.spec.containers[0].image="docker-registry.default.svc:5000/${devProject}/tasks:${prodTag}"
@@ -189,7 +193,7 @@ podTemplate(
             } 
 
             debug = openshift.selector("route", "tasks").object()
-            echo "[DEBUG22] route tasks: ${debug}"
+            echo "[DEBUG2] route tasks: ${debug}"
 
             activeApp = openshift.selector("route", "tasks").object().spec.to.name
             if (activeApp == "tasks-green") {
@@ -198,6 +202,7 @@ podTemplate(
 
             echo "Active Application:      " + activeApp
             echo "Destination Application: " + destApp
+            echo "VERSION:                 '${prodTag} (${destApp})'"
           }
         }
       }
