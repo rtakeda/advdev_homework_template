@@ -110,7 +110,7 @@ podTemplate(
             def configmap = openshift.create('configmap', 'tasks-config', '--from-file=./configuration/application-users.properties', '--from-file=./configuration/application-roles.properties')
 
             // Deploy the dev application
-            openshift.set("env", "dc/tasks", "-n e5e1-tasks-dev --overwrite VERSION='${devTag} (tasks-dev)'")
+            openshift.set("env", "dc/tasks", "-n ${devProject} --overwrite VERSION='${devTag} (tasks-dev)'")
             openshift.selector("dc", "tasks").rollout().latest();
 
             echo "VERSION:                 '${devTag} (tasks-dev)'"
@@ -171,7 +171,7 @@ podTemplate(
             def dc = openshift.selector("dc", "${destApp}").object()
             dc.spec.template.spec.containers[0].image="docker-registry.default.svc:5000/${devProject}/tasks:${prodTag}"
 
-            openshift.set("env", "dc/${destApp}", "-n e5e1-tasks-prod --overwrite VERSION='${prodTag} (${destApp})'")
+            openshift.set("env", "dc/${destApp}", "-n ${prodProject} --overwrite VERSION='${prodTag} (${destApp})'")
             openshift.apply(dc)
 
             // Update config map just in case config files changed in the source
