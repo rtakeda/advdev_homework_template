@@ -163,13 +163,13 @@ podTemplate(
 
             echo "Active Application:      " + activeApp
             echo "Destination Application: " + destApp
-
             // Update the image on the Prod deployment config
-            def dc = openshift.selector("dc/${destApp}").object()
+            def dc = openshift.selector("dc", "${destApp}").object()
             dc.spec.template.spec.containers[0].image="docker-registry.default.svc:5000/${devProject}/tasks:${prodTag}"
-
+            dc.spec.template.spec.containers[0].env.name = "VERSION"
+            dc.spec.template.spec.contianers[0].env.value = "${prodTag} (${destApp})"
+            //openshift.set("env", "dc/${destApp}", "--overwrite VERSION='${prodTag} (${destApp})'")
             openshift.apply(dc)
-            openshift.set("env", "dc/${destApp}", "--overwrite VERSION='${prodTag} (${destApp})'")
 
             // Update config map just in case config files changed in the source
             openshift.selector("configmap", "${destApp}-config").delete()
@@ -184,15 +184,10 @@ podTemplate(
             def rc_prod = openshift.selector("rc", "${destApp}-${dc_version}").object()
             echo "Waiting for ${destApp} to be ready"
            
-debug = dc.describe()
-echo "[DEBUG DC] ${debug}"
-
- 
             while (rc_prod.spec.replicas != rc_prod.status.readyReplicas) {
               sleep 5
               rc_prod = openshift.selector("rc", "${destApp}-${dc_version}").object()
             } 
-
 
             debug = openshift.selector("route", "tasks").object()
             echo "[DEBUG22] route tasks: ${debug}"
